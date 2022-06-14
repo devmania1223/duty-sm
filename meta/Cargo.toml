@@ -1,0 +1,15 @@
+[package]
+name = "duty-nft-marketplace-meta"
+version = "0.0.0"
+authors = [""]
+edition = "2022"
+publish = false
+
+[dependencies.esdt-nft-marketplace]
+path = ".."
+
+[dependencies.elrond-wasm]
+version = "0.31.1"
+
+[dependencies.elrond-wasm-debug]
+version = "0.31.1"
