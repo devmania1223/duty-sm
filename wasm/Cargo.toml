@@ -1,12 +1,17 @@
 [package]
-name = "duty-nft-marketplace-wasm"
+name = "crowdfunding-wasm"
 version = "0.0.0"
-authors = [""]
-edition = "2022"
+authors = [ "you",]
+edition = "2018"
 publish = false
 
 [lib]
-crate-type = ["cdylib"]
+crate-type = [ "cdylib",]
+
+[workspace]
+members = [ ".",]
+
+[dev-dependencies]
 
 [profile.release]
 codegen-units = 1
@@ -15,15 +20,12 @@ lto = true
 debug = false
 panic = "abort"
 
-[dependencies.esdt-nft-marketplace]
+[dependencies.crowdfunding]
 path = ".."
 
 [dependencies.elrond-wasm-node]
-version = "0.31.1"
+version = "0.32.0"
 
 [dependencies.elrond-wasm-output]
-version = "0.31.1"
-features = ["wasm-output-mode"]
-
-[workspace]
-members = ["."]
+version = "0.32.0"
+features = [ "wasm-output-mode",]

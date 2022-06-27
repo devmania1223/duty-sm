@@ -1,15 +1,14 @@
 [package]
-name = "duty-nft-marketplace-meta"
+name = "crowdfunding-meta"
 version = "0.0.0"
-authors = [""]
-edition = "2022"
+edition = "2018"
 publish = false
+authors = [ "you",]
 
-[dependencies.esdt-nft-marketplace]
+[dev-dependencies]
+
+[dependencies.crowdfunding]
 path = ".."
 
-[dependencies.elrond-wasm]
-version = "0.31.1"
-
 [dependencies.elrond-wasm-debug]
-version = "0.31.1"
+version = "0.32.0"
