@@ -1,0 +1,17 @@
+[package]
+name = "seller-contract-mock-meta"
+version = "0.0.0"
+edition = "2018"
+publish = false
+authors = ["dev.man"]
+
+[dev-dependencies]
+
+[dependencies.seller-contract-mock]
+path = ".."
+
+[dependencies.elrond-wasm]
+version = "0.33.0"
+
+[dependencies.elrond-wasm-debug]
+version = "0.33.0"
