@@ -53,9 +53,8 @@ pub trait ShareholdersModule:
             let reward_entry: RewardEntry<Self::Api> = rewards_entry_mapper.get();
 
             let _ = whitelist_mapper.swap_remove(&caller);
-            if whitelist_mapper.is_empty() {
-                rewards_entry_mapper.clear();
-            }
+
+            rewards_entry_mapper.clear();
 
             if reward_entry.egld_amount > 0 {
                 self.send().direct_egld(&caller, &reward_entry.egld_amount);
