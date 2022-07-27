@@ -10,16 +10,15 @@ elrond_wasm_node::wasm_endpoints! {
         callBack
         addToWhitelist
         addUserToAdminList
-        mintNft
         claimMintPayments
+        claimNfts
+        claimNftsByIds
         claimRoyalties
         claimRoyaltiesFromMarketplace
         getAccumulatedMintPayments
         getAccumulatedRoyalties
         getAllBrandsInfo
         getBrandInfo
-        getCollectionsCategory
-        getMaxNftsPerTransaction
         getMintPaymentsClaimAddress
         getMintWhitelist
         getNftTokenIdForBrand
@@ -30,10 +29,11 @@ elrond_wasm_node::wasm_endpoints! {
         getTagsForBrand
         giveawayNfts
         issueTokenForBrand
+        mintNft
         removeFromWhitelist
         removeUserFromAdminList
-        setMaxNftsPerTransaction
         setMintPaymentsClaimAddress
+        setMintToken
         setMintWhitelistExpireTimestamp
         setRoyaltiesClaimAddress
     )

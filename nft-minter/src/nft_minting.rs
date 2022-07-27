@@ -33,13 +33,6 @@ pub trait NftMintingModule:
                 if val == 0 {
                     return PaymentsVec::new();
                 }
-
-                let max_nfts_per_transaction = self.max_nfts_per_transaction().get();
-                require!(
-                    val <= max_nfts_per_transaction,
-                    "Max NFTs per transaction limit exceeded"
-                );
-
                 val
             }
             OptionalValue::None => NFT_AMOUNT as usize,

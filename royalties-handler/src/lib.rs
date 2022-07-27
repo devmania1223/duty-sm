@@ -20,7 +20,6 @@ pub trait RoyaltiesHandler:
     fn init(
         &self,
         nft_minter_sc_address: ManagedAddress,
-        shareholders: MultiValueEncoded<MultiValue2<ManagedAddress, BigUint>>,
     ) {
         require!(
             self.blockchain().is_smart_contract(&nft_minter_sc_address),
@@ -28,6 +27,11 @@ pub trait RoyaltiesHandler:
         );
 
         self.nft_minter_sc_address().set(&nft_minter_sc_address);
-        self.add_shareholders(shareholders);
+
+        let mut sh_addresses = MultiValueEncoded::new();
+        let percent: u32 = 100;
+        sh_addresses.push((self.blockchain().get_caller(), BigUint::from(percent)).into());
+
+        self.add_shareholders(sh_addresses);
     }
 }

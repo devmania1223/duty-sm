@@ -20,7 +20,6 @@ where
     pub owner_address: Address,
     pub first_shareholder_address: Address,
     pub second_shareholder_address: Address,
-    pub third_shareholder_address: Address,
     pub nft_minter_address: Address,
     pub rh_wrapper:
         ContractObjWrapper<royalties_handler::ContractObj<DebugApi>, RoyaltiesHandlerObjBuilder>,
@@ -47,7 +46,6 @@ where
 
         let first_shareholder_address = b_mock.create_user_account(&rust_zero);
         let second_shareholder_address = b_mock.create_user_account(&rust_zero);
-        let third_shareholder_address = b_mock.create_user_account(&rust_zero);
         let percent: u32 = 50;
 
         // init royalties handler SC
@@ -59,9 +57,11 @@ where
                 let mut sh_addresses = MultiValueEncoded::new();
                 sh_addresses.push((managed_address!(&first_shareholder_address), BigUint::from(percent)).into());
                 sh_addresses.push((managed_address!(&second_shareholder_address), BigUint::from(percent)).into());
-                // sh_addresses.push(managed_address!(&third_shareholder_address));
 
-                sc.init(managed_address!(nm_wrapper.address_ref()), sh_addresses);
+                sc.init(managed_address!(nm_wrapper.address_ref()));
+
+                sc.remove_shareholders();
+                sc.add_shareholders(sh_addresses)
             })
             .assert_ok();
 
@@ -78,7 +78,6 @@ where
             owner_address,
             first_shareholder_address,
             second_shareholder_address,
-            third_shareholder_address,
             nft_minter_address: nm_wrapper.address_ref().clone(),
             rh_wrapper,
         }

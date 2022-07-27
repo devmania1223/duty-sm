@@ -14,6 +14,7 @@ pub trait ShareholdersModule:
     #[endpoint(addShareholders)]
     fn add_shareholders(&self, shareholders: MultiValueEncoded<MultiValue2<ManagedAddress, BigUint>>) {
         let mut total_percent: BigUint = BigUint::zero();
+        let full_percent: u32 = 100;
         for sh in shareholders {
             let (address, percent) = sh.into_tuple();
             self.shareholders().insert(AddressPair{
@@ -23,8 +24,8 @@ pub trait ShareholdersModule:
             total_percent = &total_percent + &percent;
         }
         require!(
-            total_percent == 100,
-            "The sum of percent must be one"
+            total_percent == BigUint::from(full_percent),
+            "The sum of percent must be 100"
         );        
     }
 

@@ -33,14 +33,6 @@ pub struct MintPrice<M: ManagedTypeApi> {
 
 #[elrond_wasm::module]
 pub trait CommonStorageModule {
-    #[view(getCollectionsCategory)]
-    #[storage_mapper("collectionsCategory")]
-    fn collections_category(&self) -> SingleValueMapper<ManagedBuffer>;
-
-    #[view(getMaxNftsPerTransaction)]
-    #[storage_mapper("maxNftsPerTransaction")]
-    fn max_nfts_per_transaction(&self) -> SingleValueMapper<usize>;
-
     #[view(getRegisterdCollectionHashes)]
     #[storage_mapper("registeredCollectionHashes")]
     fn registered_collection_hashes(&self) -> UnorderedSetMapper<CollectionHash<Self::Api>>;

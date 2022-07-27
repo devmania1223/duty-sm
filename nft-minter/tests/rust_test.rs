@@ -10,7 +10,6 @@ use nft_minter::nft_attributes_builder::{NftAttributesBuilderModule, COLLECTION_
 use nft_minter::nft_tier::NftTierModule;
 use nft_minter::royalties::RoyaltiesModule;
 use nft_minter::views::{TierInfoEntry, ViewsModule};
-use nft_minter::NftMinter;
 use nft_minter_interactor::*;
 
 #[test]
@@ -195,27 +194,15 @@ fn mint_nft_test() {
         .assert_user_error("Invalid payment");
 
     // try buy too many - over max limit
-    nm_setup
-        .call_mint_nft(
-            &second_user_address,
-            FIRST_MINT_PRICE_TOKEN_ID,
-            FIRST_MINT_PRICE_AMOUNT * 5,
-            FIRST_BRAND_ID,
-            3,
-        )
-        .assert_user_error("Max NFTs per transaction limit exceeded");
-
-    nm_setup
-        .b_mock
-        .execute_tx(
-            &nm_setup.owner_address,
-            &nm_setup.nm_wrapper,
-            &rust_biguint!(0),
-            |sc| {
-                sc.set_max_nfts_per_transaction(1_000);
-            },
-        )
-        .assert_ok();
+    // nm_setup
+    //     .call_mint_nft(
+    //         &second_user_address,
+    //         FIRST_MINT_PRICE_TOKEN_ID,
+    //         FIRST_MINT_PRICE_AMOUNT * 5,
+    //         FIRST_BRAND_ID,
+    //         3,
+    //     )
+    //     .assert_user_error("Max NFTs per transaction limit exceeded");   
 
     // try buy too many - not enough available
     nm_setup
