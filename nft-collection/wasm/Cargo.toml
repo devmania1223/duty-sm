@@ -1,7 +1,7 @@
 [package]
-name = "seller-contract-mock-wasm"
+name = "nft-collection-wasm"
 version = "0.0.0"
-authors = ["josh brolin"]
+authors = [ "josh brolin" ]
 edition = "2018"
 publish = false
 
@@ -20,7 +20,7 @@ lto = true
 debug = false
 panic = "abort"
 
-[dependencies.seller-contract-mock]
+[dependencies.nft-collection]
 path = ".."
 
 [dependencies.elrond-wasm-node]

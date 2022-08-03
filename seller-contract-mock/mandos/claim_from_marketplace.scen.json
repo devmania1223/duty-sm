@@ -62,11 +62,11 @@
         {
             "step": "scDeploy",
             "txId": "deploy",
-            "comment": "10% cut for the marketplace",
+            "comment": "10% fee for the marketplace",
             "tx": {
                 "from": "address:owner",
                 "value": "0",
-                "contractCode": "file:../../esdt-nft-marketplace/output/esdt-nft-marketplace.wasm",
+                "contractCode": "file:../../nft-marketplace/output/nft-marketplace.wasm",
                 "arguments": [
                     "1000"
                 ],
@@ -82,7 +82,7 @@
         },
         {
             "step": "scCall",
-            "txId": "auctionToken",
+            "txId": "createAuction",
             "comment": "arguments are: min_bid, max_bid, deadline, payment token. Nonce is skipped, since EGLD has no nonce",
             "tx": {
                 "from": "address:seller",
@@ -93,7 +93,7 @@
                     "nonce": "1",
                     "value": "1"
                 },
-                "function": "auctionToken",
+                "function": "createAuction",
                 "arguments": [
                     "100",
                     "1,000",
@@ -196,7 +196,7 @@
                         "str:claimableAmount|sc:nft_creator|nested:str:EGLD|u64:0": "200",
                         "+": ""
                     },
-                    "code": "file:../../esdt-nft-marketplace/output/esdt-nft-marketplace.wasm"
+                    "code": "file:../../nft-marketplace/output/nft-marketplace.wasm"
                 },
                 "+": {}
             }
@@ -240,7 +240,7 @@
                         "str:claimableAmount|sc:nft_creator|nested:str:EGLD|u64:0": "",
                         "+": ""
                     },
-                    "code": "file:../../esdt-nft-marketplace/output/esdt-nft-marketplace.wasm"
+                    "code": "file:../../nft-marketplace/output/nft-marketplace.wasm"
                 },
                 "+": {}
             }

@@ -1,0 +1,12 @@
+[package]
+name = "esdt-contract-mock-meta"
+version = "0.0.0"
+authors = ["josh brolin"]
+edition = "2018"
+publish = false
+
+[dependencies.esdt-contract-mock]
+path = ".."
+
+[dependencies.elrond-wasm-debug]
+version = "0.33.0"

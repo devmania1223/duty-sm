@@ -1,17 +1,14 @@
 [package]
-name = "seller-contract-mock-meta"
+name = "nft-collection-meta"
 version = "0.0.0"
 edition = "2018"
 publish = false
-authors = ["josh brolin"]
+authors = [ "josh brolin" ]
 
 [dev-dependencies]
 
-[dependencies.seller-contract-mock]
+[dependencies.nft-collection]
 path = ".."
-
-[dependencies.elrond-wasm]
-version = "0.33.0"
 
 [dependencies.elrond-wasm-debug]
 version = "0.33.0"

@@ -2,7 +2,7 @@
 
 elrond_wasm::imports!();
 
-use esdt_nft_marketplace::token_distribution::ProxyTrait as _;
+//use nft_marketplace::token_distribution::ProxyTrait as _;
 
 #[elrond_wasm::derive::contract]
 pub trait Adder {
@@ -26,5 +26,5 @@ pub trait Adder {
     }
 
     #[proxy]
-    fn market_proxy(&self, sc_address: ManagedAddress) -> esdt_nft_marketplace::Proxy<Self::Api>;
+    fn market_proxy(&self, sc_address: ManagedAddress) -> nft_marketplace::Proxy<Self::Api>;
 }

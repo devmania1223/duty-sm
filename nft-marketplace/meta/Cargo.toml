@@ -1,13 +1,11 @@
 [package]
-name = "seller-contract-mock-meta"
+name = "nft-marketplace-meta"
 version = "0.0.0"
+authors = ["josh brolin"]
 edition = "2018"
 publish = false
-authors = ["josh brolin"]
 
-[dev-dependencies]
-
-[dependencies.seller-contract-mock]
+[dependencies.nft-marketplace]
 path = ".."
 
 [dependencies.elrond-wasm]

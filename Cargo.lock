@@ -220,7 +220,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c34f04666d835ff5d62e058c3995147c06f42fe86ff053337632bca83e42702d"
 
 [[package]]
-name = "esdt-nft-marketplace"
+name = "esdt-contract-mock"
 version = "0.0.0"
 dependencies = [
  "elrond-wasm",
@@ -228,28 +228,11 @@ dependencies = [
 ]
 
 [[package]]
-name = "esdt-nft-marketplace-meta"
-version = "0.0.0"
-dependencies = [
- "elrond-wasm",
- "elrond-wasm-debug",
- "esdt-nft-marketplace",
-]
-
-[[package]]
-name = "esdt-system-sc-mock"
-version = "0.0.0"
-dependencies = [
- "elrond-wasm",
- "elrond-wasm-debug",
-]
-
-[[package]]
-name = "esdt-system-sc-mock-meta"
+name = "esdt-contract-mock-meta"
 version = "0.0.0"
 dependencies = [
  "elrond-wasm-debug",
- "esdt-system-sc-mock",
+ "esdt-contract-mock",
 ]
 
 [[package]]
@@ -377,23 +360,40 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8452105ba047068f40ff7093dd1d9da90898e63dd61736462e9cdda6a90ad3c3"
 
 [[package]]
-name = "nft-minter"
+name = "nft-collection"
 version = "0.0.0"
 dependencies = [
  "elrond-wasm",
  "elrond-wasm-debug",
- "esdt-system-sc-mock",
+ "esdt-contract-mock",
  "hex",
  "num-bigint",
  "num-traits",
 ]
 
 [[package]]
-name = "nft-minter-meta"
+name = "nft-collection-meta"
 version = "0.0.0"
 dependencies = [
  "elrond-wasm-debug",
- "nft-minter",
+ "nft-collection",
+]
+
+[[package]]
+name = "nft-marketplace"
+version = "0.0.0"
+dependencies = [
+ "elrond-wasm",
+ "elrond-wasm-debug",
+]
+
+[[package]]
+name = "nft-marketplace-meta"
+version = "0.0.0"
+dependencies = [
+ "elrond-wasm",
+ "elrond-wasm-debug",
+ "nft-marketplace",
 ]
 
 [[package]]
@@ -580,24 +580,24 @@ dependencies = [
 ]
 
 [[package]]
-name = "royalties-handler"
+name = "reward-handler"
 version = "0.0.0"
 dependencies = [
  "elrond-wasm",
  "elrond-wasm-debug",
- "esdt-system-sc-mock",
+ "esdt-contract-mock",
  "hex",
- "nft-minter",
+ "nft-collection",
  "num-bigint",
  "num-traits",
 ]
 
 [[package]]
-name = "royalties-handler-meta"
+name = "reward-handler-meta"
 version = "0.0.0"
 dependencies = [
  "elrond-wasm-debug",
- "royalties-handler",
+ "reward-handler",
 ]
 
 [[package]]
@@ -621,7 +621,7 @@ version = "0.0.0"
 dependencies = [
  "elrond-wasm",
  "elrond-wasm-debug",
- "esdt-nft-marketplace",
+ "nft-marketplace",
 ]
 
 [[package]]
