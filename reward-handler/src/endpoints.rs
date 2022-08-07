@@ -147,8 +147,6 @@ pub trait DutyRewardHandler:
         let entry_id = self.store_new_reward_entry();
         self.copy_shareholders_to_claim_whitelist(entry_id);
 
-        let total_percent: u32 = 100;
-
         for shareholder in self.shareholders().iter() {
 
             let mut esdt_payments = PaymentsVec::new();
@@ -159,7 +157,7 @@ pub trait DutyRewardHandler:
                 let balance_mapper = self.balance_for_token(&token_id);
                 let balance = balance_mapper.get();             
     
-                let amount_per_holder = &balance * &shareholder.percent / BigUint::from(total_percent);
+                let amount_per_holder = &balance * &shareholder.percent / BigUint::from(PERCENTAGE_TOTAL);
     
                 if token_id.is_egld() {
                     egld_amount = amount_per_holder;

@@ -44,7 +44,7 @@ where
 
         let first_shareholder_address = b_mock.create_user_account(&rust_zero);
         let second_shareholder_address = b_mock.create_user_account(&rust_zero);
-        let percent: u32 = 50;
+        let percent: u32 = 5_000;
 
         // init royalties handler SC
         let rh_wrapper =
