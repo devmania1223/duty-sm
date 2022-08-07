@@ -8,23 +8,54 @@ pub mod private_functions;
 pub mod structs;
 pub mod views;
 
+/// @author Josh Brolin
+/// @title DutyNftMarketplace
+/// @dev smart contract for marketplace
 #[elrond_wasm::contract]
 pub trait DutyNftMarketplace:
     views::ViewsModule
     + events::EventsModule
     + crate::private_functions::PrivateFunctionsModule
 {
+    /// Initialize smart contract
+    /// @param fee_percentage: the percentage of marketplace fee which is gathered at end of auction
+    /// @dev constructor of smart contract
     #[init]
     fn init(&self, fee_percentage: u64) {
         self.try_set_fee_percentage(fee_percentage);
     }
 
+    /// Set fee percentage
+    /// @param new_fee_percentage: fee percetage of marketplace (10_000 for 100%)
+    /// @dev set fee_percentage
+    ///      payable  ✔️non-payable
+    ///      requires: - only can be called by owner
     #[only_owner]
     #[endpoint(setFeePercentage)]
     fn set_fee_percentage(&self, new_fee_percentage: u64) {
         self.try_set_fee_percentage(new_fee_percentage);
     }
 
+    /// Create auction
+    /// @param min_bid: minimum price of nft can bid
+    /// @param max_bid: maximum price of nft can bid
+    /// @param deadline: deadline to bid
+    /// @param accepted_payment_token: payment token to bid
+    /// @param opt_is_fixed_price: bid price is fixed or not, (true: fixed, false: normal)
+    /// @param opt_accepted_payment_token_nonce: token nonce of payment token(can be omitted if accepted_payment_token is egld)
+    /// @param opt_start_time: start timestamp to bid
+    /// @dev create auction for bid and buy
+    ///          emit the event of auction creation, 
+    /// @return auction_id(id of created auction)
+    ///      ✔️payable  non-payable
+    ///      requires: - min_bid and max_bid should be same if opt_is_fixed_price is true
+    ///                - min_bid should not be greater than max_bid
+    ///                - min_bid should be higher than zero
+    ///                - nft_amount(call_value) should be one
+    ///                - nft_nonce(call_value) should be greater than zero
+    ///                - current timestamp should be less than deadline
+    ///                - opt_start_time should be greater than current timestamp and less than deadline
+    ///                - marketplace fee + royalties can not exceed PERCENTAGE_TOTAL(10_000 for 100%)
     #[payable("*")]
     #[endpoint(createAuction)]
     #[allow(clippy::too_many_arguments)]
@@ -69,7 +100,7 @@ pub trait DutyNftMarketplace:
         require!(nft_amount == NFT_AMOUNT, "NFT amount must be one");
         require!(
             nft_nonce > 0,
-            "Only Semi-Fungible and Non-Fungible tokens can be auctioned"
+            "Only Non-Fungible tokens can be auctioned"
         );
         require!(deadline > current_time, "Deadline can't be in the past");
         require!(
@@ -123,6 +154,13 @@ pub trait DutyNftMarketplace:
         auction_id
     }
 
+    /// End auction
+    /// @param auction_id: id of auction to end
+    /// @dev end auction and distribute tokens after auction end
+    ///          emit the event of auction end
+    ///      payable  ✔️non-payable
+    ///      requires: - auction can be end if deadline has passed or current bid is equal to max bid
+    ///                - auction type can not be fixed type
     #[endpoint(endAuction)]
     fn end_auction(&self, auction_id: u64) {
         let auction = self.try_get_auction(auction_id);
@@ -150,6 +188,13 @@ pub trait DutyNftMarketplace:
         self.emit_end_auction_event(auction_id, auction);
     }
 
+    /// Cancel auction
+    /// @param auction_id: id of auction to cancel
+    /// @dev cancel auction and return nft to caller
+    ///          emit the event of auction cancelled
+    ///      payable  ✔️non-payable
+    ///      requires: - caller should be original owner of auction
+    ///                - can not cancel if current id is higher than zero or auction type is fixed type
     #[endpoint(cancelAuction)]
     fn cancel_auction(&self, auction_id: u64) {
         let auction = self.try_get_auction(auction_id);
@@ -179,6 +224,17 @@ pub trait DutyNftMarketplace:
         self.emit_cancel_auction_event(auction_id, auction);
     }
 
+    /// Bid to auction
+    /// @param auction_id: id of auction to bid
+    /// @param nft_type: token identifier of nft to bid(created while adding collection)
+    /// @param nft_nonce: nonce of nft(sequence of nft in collection)
+    /// @dev set current winner of auction to caller and refund losing bid if success
+    ///          emit the bid event
+    ///      ✔️payable  non-payable
+    ///      requires: - auction type can not be fixed type
+    ///                - payment_amount(call_value) should be greater than or equal to min_bid
+    ///                - payment_amount(call_value) should be greater than current_bid
+    ///                - payment_amount(call_value) should be less than or equal to max_bid
     #[payable("*")]
     #[endpoint]
     fn bid(&self, auction_id: u64, nft_type: TokenIdentifier, nft_nonce: u64) {
@@ -234,6 +290,15 @@ pub trait DutyNftMarketplace:
         self.emit_bid_event(auction_id, auction);
     }
 
+    /// Buy nft
+    /// @param auction_id: id of auction to buy
+    /// @param nft_type: token identifier of nft to buy(created while adding collection)
+    /// @param nft_nonce: nonce of nft(sequence of nft in collection)
+    /// @dev set current winner and current bid to caller and payment amount and distrubute tokens if success
+    ///          emit the buy event
+    ///      ✔️payable  non-payable
+    ///      requires: - auction type should be fixed type
+    ///                - payment_amount(call_value) should be equal to min_bid
     #[payable("*")]
     #[endpoint(buy)]
     fn buy(
@@ -274,6 +339,13 @@ pub trait DutyNftMarketplace:
         self.emit_buy_event(auction_id, auction);
     }
 
+    /// Claim tokens
+    /// @param claim_destination: address to send claimed tokens
+    /// @param token_nonce_pairs: pairs of token identifier and nonce 
+    /// @dev send claimable amount of caller to claim_destination
+    ///          emit the buy event
+    ///      payable  ✔️non-payable
+    /// @return egld_payment_amount and list of payment token identifier, nonce and amount
     #[endpoint(claimTokens)]
     fn claim_tokens(
         &self,

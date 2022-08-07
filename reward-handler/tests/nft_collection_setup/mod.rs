@@ -1,5 +1,5 @@
 use super::constants::*;
-use elrond_wasm::types::{Address, EsdtLocalRole, ManagedVec};
+use elrond_wasm::types::{Address, EsdtLocalRole};
 use elrond_wasm_debug::{
     managed_address, managed_biguint, managed_buffer, rust_biguint,
     testing_framework::{BlockchainStateWrapper, ContractObjWrapper},
@@ -167,7 +167,7 @@ where
         mint_price_amount: u64,
         token_display_name: &[u8],
         token_ticker: &[u8],
-        tags: &[&[u8]],
+        tags: &[u8],
         total_nfts: usize,
     ) -> TxResult {
         self.b_mock.execute_tx(
@@ -175,10 +175,6 @@ where
             &self.nm_wrapper,
             &rust_biguint!(ISSUE_COST),
             |sc| {
-                let mut managed_tags = ManagedVec::new();
-                for tag in tags {
-                    managed_tags.push(managed_buffer!(&tag));
-                }
 
                 sc.add_collection(
                     collection_hash.into(),
@@ -191,7 +187,7 @@ where
                     managed_buffer!(token_display_name),
                     managed_buffer!(token_ticker),
                     0,
-                    managed_tags,
+                    managed_buffer!(tags),
                     total_nfts,
                     managed_biguint!(mint_price_amount)
                 );

@@ -21,7 +21,7 @@ pub const FIRST_MINT_PRICE_AMOUNT: u64 = 1_000;
 pub const FIRST_TOKEN_DISPLAY_NAME: &[u8] = b"FirstToken";
 pub const FIRST_TOKEN_TICKER: &[u8] = b"FIRST";
 pub const FIRST_TOKEN_ID: &[u8] = b"FIRST-000000";
-pub const FIRST_TAGS: &[&[u8]] = &[b"funny", b"sad", b"memes"];
+pub const FIRST_TAGS: &[u8] = b"tags:funny,sad,memes";
 pub const FIRST_NFT_AMOUNTS: usize = 5;
 pub const SECOND_COLLECTION_HASH: &[u8; COLLECTION_HASH_LEN] =
     b"SecondCollection______________________________";
@@ -34,7 +34,7 @@ pub const SECOND_MINT_PRICE_AMOUNT: u64 = 100_000;
 pub const SECOND_TOKEN_DISPLAY_NAME: &[u8] = b"SecondToken";
 pub const SECOND_TOKEN_TICKER: &[u8] = b"SECOND";
 pub const SECOND_TOKEN_ID: &[u8] = b"SECOND-111111";
-pub const SECOND_TAGS: &[&[u8]] = &[b"random", b"good", b"best"];
+pub const SECOND_TAGS: &[u8] = b"tags:random,good,best";
 pub const SECOND_NFT_AMOUNTS: usize = 10;
 
 pub const THIRD_COLLECTION_HASH: &[u8; COLLECTION_HASH_LEN] =

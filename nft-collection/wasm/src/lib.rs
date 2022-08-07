@@ -8,6 +8,7 @@ elrond_wasm_node::wasm_endpoints! {
     nft_collection
     (
         callBack
+        addCollection
         addToWhitelist
         addUserToAdminList
         claimMintPayments
@@ -28,7 +29,6 @@ elrond_wasm_node::wasm_endpoints! {
         getRoyaltiesClaimAddress
         getTagsForCollection
         giveawayNfts
-        addCollection
         mintNft
         removeFromWhitelist
         removeUserFromAdminList

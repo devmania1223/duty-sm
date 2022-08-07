@@ -14,10 +14,10 @@ elrond_wasm_node::wasm_endpoints! {
         createNewRewardEntry
         getClaimWhitelistForEntry
         getClaimableEntryIdsForAddress
+        getDutyNftMinterScAddress
         getLastClaimEpoch
         getLastEntryId
         getLastRewardEntryEpoch
-        getDutyNftMinterScAddress
         getShareholders
         getTokenBalances
         removeShareholders

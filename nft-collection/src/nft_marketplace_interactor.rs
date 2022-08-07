@@ -16,11 +16,20 @@ pub mod nft_marketplace_proxy {
     }
 }
 
+/// @author Josh Brolin
+/// @title NftMarketplaceInteractorModule
+/// @dev module for interacting with marketplace to claim royalties
 #[elrond_wasm::module]
 pub trait NftMarketplaceInteractorModule:
     crate::private_functions::PrivateFunctionsModule
     +crate::storage::StorageModule
 {
+    /// Claim royalties from marketplace
+    /// @param marketplace_address: the address of marketplace contract
+    /// @param tokens: the list of token identifiers to claim
+    /// @dev claim royalties from marketplace by calling claim_tokens function in nft marketplace contract
+    ///      payable  ✔️non-payable
+    ///      requires: - only can be called by admin
     #[endpoint(claimRoyaltiesFromMarketplace)]
     fn claim_royalties_from_marketplace(
         &self,

@@ -29,13 +29,5 @@ pub trait ViewsModule {
     ) -> SingleValueMapper<BigUint>;
 
     #[storage_mapper("auctionById")]
-    fn auction_by_id(&self, auction_id: u64) -> SingleValueMapper<Auction<Self::Api>>;
-
-    fn get_nft_info1(&self, nft_type: &TokenIdentifier, nft_nonce: u64) -> EsdtTokenData<Self::Api> {
-        self.blockchain().get_esdt_token_data(
-            &self.blockchain().get_sc_address(),
-            nft_type,
-            nft_nonce,
-        )
-    }
+    fn auction_by_id(&self, auction_id: u64) -> SingleValueMapper<Auction<Self::Api>>;   
 }

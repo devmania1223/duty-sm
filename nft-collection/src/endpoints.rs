@@ -9,10 +9,13 @@ pub mod structs;
 pub mod views;
 pub mod storage;
 
-use crate::structs::{CollectionId, CollectionInfo, CollectionHash, Tag, TimePeriod, TempCallbackStorageInfo,
+use crate::structs::{CollectionId, CollectionInfo, CollectionHash, TimePeriod, TempCallbackStorageInfo,
     TempCallbackTierInfo, MintPrice, PaymentsVec, EgldValuePaymentsVecPair, 
     MAX_COLLECTION_ID_LEN, INVALID_COLLECTION_ID_ERR_MSG, NFT_ISSUE_COST, ROYALTIES_MAX, NFT_AMOUNT};
 
+/// @author Josh Brolin
+/// @title DutyNftMinter
+/// @dev smart contract for collection and nft minting
 #[elrond_wasm::contract]
 pub trait DutyNftMinter:
  nft_marketplace_interactor::NftMarketplaceInteractorModule
@@ -21,6 +24,10 @@ pub trait DutyNftMinter:
     + events::EventsModule
     + storage::StorageModule
 {
+    /// Initialize smart contract
+    /// @param royalties_claim_address: the address of the account or contract who can claim royalties
+    /// @param mint_payments_claim_address: the address of the account or contract who can claim mint fee
+    /// @dev constructor of smart contract
     #[init]
     fn init(
         &self,
@@ -32,18 +39,57 @@ pub trait DutyNftMinter:
             .set(&mint_payments_claim_address);
     }
 
+    /// Add user to admin list
+    /// @param address: the address to be added to admin list
+    /// @dev add user to the list of admin who can create collection, manage whitelist, ...
+    ///      payable  ✔️non-payable
+    ///      requires: - only can be called by owner
     #[only_owner]
     #[endpoint(addUserToAdminList)]
     fn add_user_to_admin_list(&self, address: ManagedAddress) {
         self.admin_whitelist().add(&address);
     }
 
+    /// Remove user from admin list
+    /// @param address: the address to be added to admin list
+    /// @dev remove user from the list of admin who can create collection, manage whitelist, ...
+    ///      payable  ✔️non-payable
+    ///      requires: - only can be called by owner
     #[only_owner]
     #[endpoint(removeUserFromAdminList)]
     fn remove_user_from_admin_list(&self, address: ManagedAddress) {
         self.admin_whitelist().remove(&address);
     }
 
+    /// Add collection
+    /// @param collection_hash: the hash value at ipfs of directory for nft assets(metadata json file, image file, ...) of the collection
+    /// @param collection_id: identifier for collection in smart contract, this should be generated externally
+    /// @param media_type: the extension of nft image file(png, jpg, ...)
+    /// @param royalties: the percentage of royalty, 10_000 for 100%
+    /// @param mint_start_timestamp: the timestamp when user can start minting
+    /// @param mint_end_timestamp: the timestamp when user should end minting, user can't mint after this timestamp
+    /// @param mint_price_token_id: the token identifier of payment for minting
+    /// @param token_display_name: the name of non-fungible token which user mints
+    /// @param token_ticker: the ticker of non-fungible token which user mints
+    /// @param whitelist_expire_timestamp: the timestamp when check the user is whitelisted
+     ///             if current timestamp is before this timestamp, check of whitelist is enabled, otherwise disabled
+    /// @param tags: the tags of nft data, to be added in medadata
+    /// @param total_nfts: total count of nfts that can be minted in this collection
+    /// @param mint_price_token_amount: the token amount of payment for minting
+    /// @dev add collection and issue nft(not mint) for this collection, 
+    ///          emit the event of collection creation which exposes collection id and token id of nft
+    ///      ✔️payable  non-payable
+    ///      requires: - only can be called by admin
+    ///                - the length of collection_id is shorter than MAX_COLLECTION_ID_LEN(50)
+    ///                - issue costs NFT_ISSUE_COST(50_000_000_000_000_000 for 0.05 EGLD)
+    ///                - media_type should be supported media type(png, jpeg, jpg, gif, acc, flac, m4a, mp3, wav, mov, quicktime, mp4, webm)
+    ///                - royalties should be less than ROYALTIES_MAX(10_000 for 100%)
+    ///                - mint_price_token_id should be valid
+    ///                - collection_hash should be unique
+    ///                - collection_id should be unique
+    ///                - mint_start_timestamp should be less than mint_end_timestamp
+    ///                - total_nfts should be greater than zero
+    ///                - mint_price_token_amount should be greater than zero
     #[payable("EGLD")]
     #[endpoint(addCollection)]
     fn add_collection(
@@ -58,7 +104,7 @@ pub trait DutyNftMinter:
         token_display_name: ManagedBuffer,
         token_ticker: ManagedBuffer,
         whitelist_expire_timestamp: u64,
-        tags: ManagedVec<Tag<Self::Api>>,
+        tags: ManagedBuffer,
         total_nfts: usize,
         mint_price_token_amount: BigUint,
     ) {
@@ -179,6 +225,13 @@ pub trait DutyNftMinter:
         self.temporary_callback_storage(&collection_id).clear();
     }
 
+    /// Set mint token identifier and amount for mint fee
+    /// @param collection_id: collection id to set mint token
+    /// @param mint_price_token_id: token identifier that can be used payment for mint fee
+    /// @param mint_price_token_amount: the token amount of mint fee
+    /// @dev set mint token of payment before user mints
+    ///      payable  ✔️non-payable
+    ///      requires: - only can be called by admin
     #[endpoint(setMintToken)]
     fn set_mint_token(
         &self,
@@ -195,6 +248,12 @@ pub trait DutyNftMinter:
                     });
     }    
 
+    /// Add users to whitelist
+    /// @param collection_id: collection id to add users
+    /// @param users: list of user addresses to add to whitelist
+    /// @dev add user address list to whitelist 
+    ///      payable  ✔️non-payable
+    ///      requires: - only can be called by admin
     #[endpoint(addToWhitelist)]
     fn add_to_whitelist(
         &self,
@@ -209,6 +268,12 @@ pub trait DutyNftMinter:
         }
     }
 
+    /// Remove users from whitelist
+    /// @param collection_id: collection id to remove users
+    /// @param users: list of user addresses to remove from whitelist
+    /// @dev remove user address list to whitelist 
+    ///      payable  ✔️non-payable
+    ///      requires: - only can be called by admin
     #[endpoint(removeFromWhitelist)]
     fn remove_from_whitelist(
         &self,
@@ -223,6 +288,13 @@ pub trait DutyNftMinter:
         }
     }
 
+    /// Set whitelist expiretimestamp for minting
+    /// @param collection_id: collection id to set whitelist expiretimestamp
+    /// @param timestamp: the timestamp when check the user is whitelisted
+    ///             if current timestamp is before this timestamp, check of whitelist is enabled, otherwise disabled
+    /// @dev set mint whitelist expire timestamp
+    ///      payable  ✔️non-payable
+    ///      requires: - only can be called by admin
     #[endpoint(setMintWhitelistExpireTimestamp)]
     fn set_mint_whitelist_expire_timestamp(&self, collection_id: CollectionId<Self::Api>, timestamp: u64) {
         self.require_caller_is_admin();
@@ -231,6 +303,17 @@ pub trait DutyNftMinter:
             .update(|info| info.whitelist_expire_timestamp = timestamp);
     }
 
+    /// Mint nfts
+    /// @param collection_id: collection id to mint nft
+    /// @param opt_nfts_to_buy: count of nfts to mint(optional value, count is to be 1 when omit this param)
+    /// @dev mint nft to collection
+    ///      ✔️payable  non-payable
+    ///      requires: - collection_id should be registered collection_id(it's registered while adding collection)
+    ///                - token identifier of call value should be same as token identifier of the collection(registered while adding collection)
+    ///                - token amount of call value should be same as the multiplied value of opt_nfts_to_buy and payment token amount(registered while adding collection)
+    ///                - current timestamp should be greater than mint_start_timestamp(registered while adding collection)
+    ///                - current timestamp should be less than mint_end_timestamp(registered while adding collection)
+    ///                - caller should be whitelisted if current timestamp is less than whitelist_expire_timestamp(registered while adding collection)
     #[payable("*")]
     #[endpoint(mintNft)]
     fn mint_nft(
@@ -291,6 +374,13 @@ pub trait DutyNftMinter:
         output_payments
     }
 
+    /// Send giveaway nfts
+    /// @param collection_id: collection id to send giveaway nfts
+    /// @param dest_amount_pairs: pairs of address and amount to send
+    /// @dev send giveaway nfts
+    ///      payable  ✔️non-payable    
+    ///      requires: - only can be called by admin
+    ///                - collection_id should be registered collection_id(it's registered while adding collection)
     #[endpoint(giveawayNfts)]
     fn giveaway_nfts(
         &self,
@@ -322,6 +412,14 @@ pub trait DutyNftMinter:
         self.nft_giveaway_event(&collection_id, total);
     }
 
+    /// Claim nfts by amount
+    /// @param collection_id: collection id to claim nfts
+    /// @param claim_amount: amount of nfts to claim
+    /// @dev claim random nfts by amount
+    ///      payable  ✔️non-payable    
+    ///      requires: - only can be called by admin
+    ///                - collection_id should be registered collection_id(it's registered while adding collection)
+    ///                - claim_amount should be greater than 0
     #[endpoint(claimNfts)]
     fn claim_nfts(
         &self,
@@ -351,6 +449,14 @@ pub trait DutyNftMinter:
         self.nft_claimed_event(&collection_id, claim_amount);
     }
 
+    /// Claim nfts by ids
+    /// @param collection_id: collection id to claim nfts
+    /// @param nft_ids: list of id to claim
+    /// @dev claim certain nfts by ids 
+    ///      payable  ✔️non-payable    
+    ///      requires: - only can be called by admin
+    ///                - collection_id should be registered collection_id(it's registered while adding collection)
+    ///                - collection should have enough nfts to claim
     #[endpoint(claimNftsByIds)]
     fn claim_nfts_by_ids(
         &self,
@@ -416,18 +522,31 @@ pub trait DutyNftMinter:
         self.nft_claimed_event(&collection_id, nfts_count);
     }
 
+    /// Set the address for claim royalties
+    /// @param new_address: the address of the account or contract who can claim royalties
+    /// @dev set royalties_claim_address 
+    ///      payable  ✔️non-payable    
+    ///      requires: - only can be called by admin
     #[endpoint(setRoyaltiesClaimAddress)]
     fn set_royalties_claim_address(&self, new_address: ManagedAddress) {
         self.require_caller_is_admin();
         self.royalties_claim_address().set(&new_address);
     }
 
+    /// Set the address for claim mint fee
+    /// @param new_address: the address of the account or contract who can claim mint fee
+    /// @dev set mint_payments_claim_address 
+    ///      payable  ✔️non-payable    
+    ///      requires: - only can be called by admin
     #[endpoint(setMintPaymentsClaimAddress)]
     fn set_mint_payments_claim_address(&self, new_address: ManagedAddress) {
         self.require_caller_is_admin();
         self.mint_payments_claim_address().set(&new_address);
     }
 
+    /// Claim royalties
+    /// @dev send royalties to royalties_claim_address
+    ///      payable  ✔️non-payable    
     #[endpoint(claimRoyalties)]
     fn claim_royalties(&self) -> EgldValuePaymentsVecPair<Self::Api> {
         let royalties_claim_address = self.royalties_claim_address().get();
@@ -436,6 +555,9 @@ pub trait DutyNftMinter:
         self.claim_common(royalties_claim_address, &mut mapper)
     }
 
+    /// Claim mint fee
+    /// @dev send mint fee to mint_payments_claim_address
+    ///      payable  ✔️non-payable    
     #[endpoint(claimMintPayments)]
     fn claim_mint_payments(&self) -> EgldValuePaymentsVecPair<Self::Api> {
         let mint_payments_claim_address = self.mint_payments_claim_address().get();

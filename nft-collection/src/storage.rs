@@ -34,7 +34,7 @@ pub trait StorageModule:
     fn tags_for_collection(
         &self,
         collection_id: &CollectionId<Self::Api>,
-    ) -> SingleValueMapper<ManagedVec<Tag<Self::Api>>>;
+    ) -> SingleValueMapper<Tag<Self::Api>>;
 
     #[view(getMintWhitelist)]
     #[storage_mapper("mintWhitelist")]

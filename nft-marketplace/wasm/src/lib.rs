@@ -7,17 +7,17 @@
 elrond_wasm_node::wasm_endpoints! {
     nft_marketplace
     (
-        createAuction
         bid
         buy
+        cancelAuction
         claimTokens
+        createAuction
         endAuction
         getClaimableAmount
         getFullAuctionData
         getLastValidAuctionId
         getMarketplaceFeePercentage
         setFeePercentage
-        cancel_auction
     )
 }
 

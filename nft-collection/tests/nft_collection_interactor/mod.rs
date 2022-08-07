@@ -1,7 +1,7 @@
 use super::constants::*;
 use elrond_wasm::{
     elrond_codec::multi_types::OptionalValue,
-    types::{Address, EsdtLocalRole, ManagedVec, MultiValueEncoded},
+    types::{Address, EsdtLocalRole, MultiValueEncoded},
 };
 use elrond_wasm_debug::{
     managed_address, managed_biguint, managed_buffer, rust_biguint,
@@ -162,7 +162,7 @@ where
         mint_price_amount: u64,
         token_display_name: &[u8],
         token_ticker: &[u8],
-        tags: &[&[u8]],
+        tags: &[u8],
         total_nfts: usize,
         whitelist_expire_epoch: u64,
     ) -> TxResult {
@@ -170,13 +170,7 @@ where
             &self.owner_address,
             &self.nm_wrapper,
             &rust_biguint!(ISSUE_COST),
-            |sc| {
-                let mut managed_tags = ManagedVec::new();
-                for tag in tags {
-                    managed_tags.push(managed_buffer!(&tag));
-                }              
-
-
+            |sc| {    
                 sc.add_collection(
                     collection_hash.into(),
                     managed_buffer!(collection_id),
@@ -188,7 +182,7 @@ where
                     managed_buffer!(token_display_name),
                     managed_buffer!(token_ticker),
                     whitelist_expire_epoch,
-                    managed_tags,
+                    managed_buffer!(tags),
                     total_nfts,
                     managed_biguint!(mint_price_amount)
                 );

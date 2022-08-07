@@ -42,12 +42,10 @@ pub struct TempCallbackTierInfo<M: ManagedTypeApi> {
 #[derive(TopEncode, TopDecode)]
 pub struct TempCallbackStorageInfo<M: ManagedTypeApi> {
     pub collection_info: CollectionInfo<M>,
-    pub tags: ManagedVec<M, Tag<M>>,
+    pub tags: Tag<M>,
     pub tier_info: TempCallbackTierInfo<M>
 }
 
-pub static TAGS_PREFIX: &[u8] = b"tags:";
-pub static TAG_SEPARATOR: &[u8] = b",";
 pub static ATTRIBUTES_SEPARATOR: &[u8] = b";";
 
 pub static SUPPORTED_MEDIA_TYPES: &[&[u8]] = &[

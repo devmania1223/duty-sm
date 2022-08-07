@@ -7,15 +7,21 @@ pub mod private_functions;
 pub mod views;
 pub mod structs;
 
-use crate::structs::{RewardEntry, AddressPair};
+use crate::structs::{RewardEntry, AddressPair, PERCENTAGE_TOTAL};
 use nft_collection::structs::PaymentsVec;
 
+/// @author Josh Brolin
+/// @title DutyRewardHandler
+/// @dev smart contract for reward handler
 #[elrond_wasm::contract]
 pub trait DutyRewardHandler:
     nft_collection_interactor::DutyNftMinterInteractorModule
     + views::ViewsModule
     + crate::private_functions::PrivateFunctionsModule
 {
+    /// Initialize smart contract
+    /// @param nft_collection_sc_address: smart contract address of nft collection
+    /// @dev constructor of smart contract, set shareholder address and percentage to caller and PERCENTAGE_TOTAL(10_000 for 100%)
     #[init]
     fn init(
         &self,
@@ -29,17 +35,21 @@ pub trait DutyRewardHandler:
         self.nft_collection_sc_address().set(&nft_collection_sc_address);
 
         let mut sh_addresses = MultiValueEncoded::new();
-        let percent: u32 = 100;
-        sh_addresses.push((self.blockchain().get_caller(), BigUint::from(percent)).into());
+        sh_addresses.push((self.blockchain().get_caller(), BigUint::from(PERCENTAGE_TOTAL)).into());
 
         self.add_shareholders(sh_addresses);
     }
 
+    /// Add shareholders
+    /// @param shareholders: list of shareholder address and percentage
+    /// @dev set shareholders
+    ///      payable  ✔️non-payable
+    ///      requires: - only can be called by owner
+    ///                - sum of percentage should be PERCENTAGE_TOTAL(10_000 for 100%)
     #[only_owner]
     #[endpoint(addShareholders)]
     fn add_shareholders(&self, shareholders: MultiValueEncoded<MultiValue2<ManagedAddress, BigUint>>) {
         let mut total_percent: BigUint = BigUint::zero();
-        let full_percent: u32 = 100;
         for sh in shareholders {
             let (address, percent) = sh.into_tuple();
             self.shareholders().insert(AddressPair{
@@ -49,11 +59,16 @@ pub trait DutyRewardHandler:
             total_percent = &total_percent + &percent;
         }
         require!(
-            total_percent == BigUint::from(full_percent),
-            "The sum of percent must be 100"
+            total_percent == BigUint::from(PERCENTAGE_TOTAL),
+            "The sum of percent must be 100%"
         );        
     }
 
+    /// Remove shareholders
+    /// @param shareholders: list of shareholder address and percentage
+    /// @dev remove shareholders
+    ///      payable  ✔️non-payable
+    ///      requires: - only can be called by owner
     #[only_owner]
     #[endpoint(removeShareholders)]
     fn remove_shareholders(&self) {
@@ -62,6 +77,11 @@ pub trait DutyRewardHandler:
         }
     }
 
+    /// Claim rewards
+    /// @param entry_ids: list of entry id(created by owner to totalize detailed distribution of reward to shareholders)
+    /// @dev claim rewards gathered to this smart contract by owner, caller is shareholder
+    ///      payable  ✔️non-payable
+    ///      requires: - caller already claimed
     #[endpoint(claimRewards)]
     fn claim_rewards(&self, entry_ids: MultiValueEncoded<usize>) {
         let caller = self.blockchain().get_caller();
@@ -92,6 +112,14 @@ pub trait DutyRewardHandler:
         }
     }
 
+    /// Create new reward entry
+    /// @dev create new reward entry for distribution of rewards to shareholders
+    ///      reward should be claimed before creation of reward entry
+    ///      payable  ✔️non-payable
+    ///      requires: - only can be called by owner
+    ///                - current epoch should be same as last_claim_epoch
+    ///                - entry can not be created for one epoch
+    ///                - shareholders should be registered
     #[only_owner]
     #[endpoint(createNewRewardEntry)]
     fn create_new_reward_entry(&self) {
@@ -119,11 +147,6 @@ pub trait DutyRewardHandler:
         let entry_id = self.store_new_reward_entry();
         self.copy_shareholders_to_claim_whitelist(entry_id);
 
-
-        // nothing to split
-        // if balance < nr_shareholders {
-        //     continue;
-        // }
         let total_percent: u32 = 100;
 
         for shareholder in self.shareholders().iter() {
