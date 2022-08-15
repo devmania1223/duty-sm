@@ -1,7 +1,7 @@
 elrond_wasm::imports!();
 
 use crate::structs::{CollectionId, CollectionInfo, CollectionHash, GenericAttributes, Uri, MediaType,
-    PaymentsVec, EgldValuePaymentsVecPair, 
+    EgldValuePaymentsVecPair, 
     ATTRIBUTES_SEPARATOR, MAX_MEDIA_TYPE_LEN, SUPPORTED_MEDIA_TYPES,
     NFT_AMOUNT, VEC_MAPPER_FIRST_ITEM_INDEX};
 
@@ -103,7 +103,7 @@ pub trait PrivateFunctionsModule:
         collection_id: &CollectionId<Self::Api>,
         collection_info: &CollectionInfo<Self::Api>,
         nfts_to_send: usize,
-    ) -> PaymentsVec<Self::Api> {
+    ) -> MultiValueEncoded<MultiValue3<TokenIdentifier, u64, usize>> {
         require!(
             !self.blockchain().is_smart_contract(to),
             "Only user accounts are allowed to mint"
@@ -117,6 +117,7 @@ pub trait PrivateFunctionsModule:
 
         let nft_token_id = self.nft_token(collection_id).get_token_id();
         let mut nft_output_payments = ManagedVec::new();
+        let mut output_nfts = MultiValueEncoded::new();
         for _ in 0..nfts_to_send {
             let nft_id = self.get_next_random_id(collection_id);
             let nft_uri = self.build_nft_main_file_uri(
@@ -150,11 +151,12 @@ pub trait PrivateFunctionsModule:
                 nft_nonce,
                 nft_amount,
             ));
+            output_nfts.push((nft_token_id.clone(), nft_nonce, nft_id).into());
         }
 
         self.send().direct_multi(to, &nft_output_payments);
 
-        nft_output_payments
+        output_nfts
     }
 
     fn claim_common(

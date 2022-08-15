@@ -10,7 +10,7 @@ pub mod views;
 pub mod storage;
 
 use crate::structs::{CollectionId, CollectionInfo, CollectionHash, TimePeriod, TempCallbackStorageInfo,
-    TempCallbackTierInfo, MintPrice, PaymentsVec, EgldValuePaymentsVecPair, 
+    TempCallbackTierInfo, MintPrice, EgldValuePaymentsVecPair, 
     MAX_COLLECTION_ID_LEN, INVALID_COLLECTION_ID_ERR_MSG, NFT_ISSUE_COST, ROYALTIES_MAX, NFT_AMOUNT};
 
 /// @author Josh Brolin
@@ -320,7 +320,7 @@ pub trait DutyNftMinter:
         &self,
         collection_id: CollectionId<Self::Api>,
         opt_nfts_to_buy: OptionalValue<usize>,
-    ) -> PaymentsVec<Self::Api> {
+    ) -> MultiValueEncoded<MultiValue3<TokenIdentifier, u64, usize>>{
         require!(
             self.registered_collections().contains(&collection_id),
             INVALID_COLLECTION_ID_ERR_MSG
@@ -329,7 +329,7 @@ pub trait DutyNftMinter:
         let nfts_to_buy = match opt_nfts_to_buy {
             OptionalValue::Some(val) => {
                 if val == 0 {
-                    return PaymentsVec::new();
+                    return MultiValueEncoded::new();
                 }
                 val
             }
