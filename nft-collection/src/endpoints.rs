@@ -162,6 +162,8 @@ pub trait DutyNftMinter:
             whitelist_expire_timestamp,
         };
 
+        self.mint_whitelist(&collection_id).insert(self.blockchain().get_caller());
+
         self.temporary_callback_storage(&collection_id)
             .set(&TempCallbackStorageInfo {
                 collection_info,
@@ -247,6 +249,29 @@ pub trait DutyNftMinter:
                         amount: mint_price_token_amount,
                     });
     }    
+
+    /// Set mint period for the collection
+    /// @param collection_id: collection id to set mint period
+    /// @param mint_start_timestamp: the timestamp when user can start minting
+    /// @param mint_end_timestamp: the timestamp when user should end minting, user can't mint after this timestamp
+    /// @dev set mint period before user mints
+    ///      payable  ✔️non-payable
+    ///      requires: - only can be called by admin
+    #[endpoint(setMintPeriod)]
+    fn set_mint_period(
+        &self,
+        collection_id: CollectionId<Self::Api>,
+        mint_start_timestamp: u64,
+        mint_end_timestamp: u64,
+    ) {
+        self.require_caller_is_admin();
+
+        self.collection_info(&collection_id)
+            .update(|info| info.mint_period = TimePeriod {
+                start: mint_start_timestamp,
+                end: mint_end_timestamp,
+            });
+    }
 
     /// Add users to whitelist
     /// @param collection_id: collection id to add users

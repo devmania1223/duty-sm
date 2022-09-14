@@ -8,6 +8,7 @@ elrond_wasm_node::wasm_endpoints! {
     nft_marketplace
     (
         bid
+        bulkBuy
         buy
         cancelAuction
         claimTokens

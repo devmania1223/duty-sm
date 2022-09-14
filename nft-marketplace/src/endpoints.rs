@@ -339,6 +339,67 @@ pub trait DutyNftMarketplace:
         self.emit_buy_event(auction_id, auction);
     }
 
+    ///  Bulk buy nfts
+    /// @param nfts: list of auction_id, nft_type, nft_nonce, payment_amount
+    /// @dev bulk buy process
+    ///          emit the buy events
+    ///      ✔️payable  non-payable
+    ///      requires: - auction type should be fixed type
+    ///                - payment_amount(call_value) should be equal to min_bid
+    ///                - total payment amount should be equal to sum of each payment amount
+    #[payable("*")]
+    #[endpoint(bulkBuy)]
+    fn bulk_buy(
+        &self,
+        nfts: MultiValueEncoded<MultiValue4<u64,TokenIdentifier, u64, u64>>
+    ) {
+        let (payment_token, payment_token_nonce, total_payment_amount) =
+            self.call_value().egld_or_single_esdt().into_tuple();
+
+        let caller = self.blockchain().get_caller();
+        let mut tmp_payment_amount: BigUint = BigUint::zero();
+
+        for nft in nfts.clone() {
+            let (auction_id, nft_type, nft_nonce, payment_amount) = nft.into_tuple();
+            let auction = self.try_get_auction(auction_id);
+
+            self.is_valid_bid(
+                &auction,
+                &nft_type,
+                nft_nonce,
+                &payment_token,
+                payment_token_nonce,
+            );
+
+            require!(
+                auction.auction_type == AuctionType::FixedType,
+                "Cannot buy NFT for this type of auction"
+            );
+    
+            require!(
+                &auction.min_bid == &payment_amount,
+                "Wrong amount paid, must pay equal to the selling price"
+            );
+
+            tmp_payment_amount = &tmp_payment_amount + &BigUint::from(payment_amount);
+        }
+        require!(
+            tmp_payment_amount == total_payment_amount,
+            "Wrong payment amount, must total payment amount equal to sum of each payment amount"
+        );
+        
+        for nft in nfts {
+            let (auction_id, _, _, payment_amount) = nft.into_tuple();
+            let mut auction = self.try_get_auction(auction_id);
+            auction.current_winner = caller.clone();
+            auction.current_bid = BigUint::from(payment_amount);
+            self.distribute_tokens_after_auction_end(&auction);
+
+            self.auction_by_id(auction_id).clear();
+            self.emit_buy_event(auction_id, auction);
+        }
+    }
+
     /// Claim tokens
     /// @param claim_destination: address to send claimed tokens
     /// @param token_nonce_pairs: pairs of token identifier and nonce 

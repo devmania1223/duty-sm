@@ -64,6 +64,11 @@ fn bid_nft_sell_all_second_go() {
 }
 
 #[test]
+fn buy_nfts() {
+    elrond_wasm_debug::mandos_go("mandos/buy_nfts.scen.json");
+}
+
+#[test]
 fn buy_nft_sell_one_by_one_go() {
     elrond_wasm_debug::mandos_go("mandos/buy_nft_sell_one_by_one.scen.json");
 }

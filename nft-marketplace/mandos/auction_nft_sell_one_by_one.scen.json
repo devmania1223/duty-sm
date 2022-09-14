@@ -24,7 +24,7 @@
                 "esdt": {
                     "tokenIdentifier": "str:NFT-123456",
                     "nonce": "1",
-                    "value": "10"
+                    "value": "1"
                 },
                 "function": "createAuction",
                 "arguments": [
@@ -56,16 +56,6 @@
                     "balance": "0",
                     "esdt": {
                         "str:NFT-123456": {
-                            "instances": [
-                                {
-                                    "nonce": "1",
-                                    "balance": "1",
-                                    "creator": "address:nft_creator",
-                                    "royalties": "2000"
-                                }
-                            ]
-                        },
-                        "str:NFT-123456": {
                             "instances": []
                         }
                     },
@@ -79,7 +69,7 @@
                             "instances": [
                                 {
                                     "nonce": "1",
-                                    "balance": "10",
+                                    "balance": "1",
                                     "creator": "address:nft_creator",
                                     "royalties": "2000"
                                 }

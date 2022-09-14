@@ -7,7 +7,7 @@
 
 # erdpy --verbose contract call  --chain="D" erd1qqqqqqqqqqqqqpgqrsqdthhs7nn5h6r3xqxkp5jajnm3rcfcuugqapeu8l --pem="../../wallet-owner.pem" --gas-limit=8000000 --function="setMaxNftsPerTransaction" --arguments 1000  --recall-nonce --send --proxy="https://devnet-gateway.elrond.com"
 
-contractAddr=erd1qqqqqqqqqqqqqpgq0k7h8d2azehlq28c49kkwexfymw6w0yfuugqvgs30u
+contractAddr=erd1qqqqqqqqqqqqqpgqgexlna9fwu6mmd8e0k2f5hucjjj86aw3uugq98r4wc
 
 echo 'addCollection'
 # not working

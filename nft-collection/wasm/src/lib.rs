@@ -33,6 +33,7 @@ elrond_wasm_node::wasm_endpoints! {
         removeFromWhitelist
         removeUserFromAdminList
         setMintPaymentsClaimAddress
+        setMintPeriod
         setMintToken
         setMintWhitelistExpireTimestamp
         setRoyaltiesClaimAddress
