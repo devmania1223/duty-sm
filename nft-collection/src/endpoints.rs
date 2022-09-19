@@ -411,7 +411,7 @@ pub trait DutyNftMinter:
         &self,
         collection_id: CollectionId<Self::Api>,
         dest_amount_pairs: MultiValueEncoded<MultiValue2<ManagedAddress, usize>>,
-    ) {
+    ) -> MultiValueEncoded<MultiValue4<TokenIdentifier, u64, usize, ManagedAddress>>{
         self.require_caller_is_admin();
 
         require!(
@@ -421,20 +421,27 @@ pub trait DutyNftMinter:
 
         let collection_info = self.collection_info(&collection_id).get();
         let mut total = 0;
+        let mut output_payments = MultiValueEncoded::new();
         for pair in dest_amount_pairs {
             let (dest_address, nfts_to_send) = pair.into_tuple();
             if nfts_to_send > 0 {
-                let _ = self._mint_and_send_random_nft(
-                    &dest_address,
+                let outputs = self._mint_and_send_random_nft(
+                    &dest_address.clone(),
                     &collection_id,
                     &collection_info,
                     nfts_to_send,
                 );
+                for item in outputs {
+                    let (nft_token_id, nft_nonce, nft_id) = item.into_tuple();
+                    output_payments.push((nft_token_id, nft_nonce, nft_id, dest_address.clone()).into())
+                }
                 total += nfts_to_send;
             }
         }
 
         self.nft_giveaway_event(&collection_id, total);
+
+        output_payments
     }
 
     /// Claim nfts by amount
@@ -450,7 +457,7 @@ pub trait DutyNftMinter:
         &self,
         collection_id: CollectionId<Self::Api>,
         claim_amount: usize,
-    ) {
+    ) -> MultiValueEncoded<MultiValue3<TokenIdentifier, u64, usize>>{
         self.require_caller_is_admin();
 
         require!(
@@ -464,7 +471,7 @@ pub trait DutyNftMinter:
         );
 
         let collection_info = self.collection_info(&collection_id).get();
-        let _ = self._mint_and_send_random_nft(
+        let output_payments = self._mint_and_send_random_nft(
             &self.blockchain().get_caller(),
             &collection_id,
             &collection_info,
@@ -472,6 +479,8 @@ pub trait DutyNftMinter:
         );
 
         self.nft_claimed_event(&collection_id, claim_amount);
+
+        output_payments
     }
 
     /// Claim nfts by ids

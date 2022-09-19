@@ -1,9 +1,13 @@
 [workspace]
 members = [
   "nft-collection",
-  "nft-collection/meta",
+  "nft-collection/meta", 
   "nft-marketplace",
   "nft-marketplace/meta",
+  "nft-stake",
+  "nft-stake/meta",
+  "nft-staking",
+  "nft-staking/meta",
   "reward-handler",
   "reward-handler/meta",
   "esdt-contract-mock",

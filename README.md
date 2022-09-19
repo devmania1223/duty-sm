@@ -215,3 +215,8 @@ fn claim_rewards(&self, entry_ids: MultiValueEncoded<usize>)
 ```
 `entry_ids` - list of entry id(created by owner to totalize detailed distribution of reward to shareholders)   
 
+### Cargo test
+1. rustup default nightly
+2. rustup toolchain install nightly
+3. rustup run nightly cargo bench 
+
